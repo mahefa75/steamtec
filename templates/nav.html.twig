@@ -1,0 +1,44 @@
+<aside class="admin-sidebar">
+    <div class="logo">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-image" height="70">
+    </div>
+    <nav>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_dashboard' %}active{% endif %}" 
+                    href="{{ path('app_admin_dashboard') }}" title="Tableau de bord">
+                    <i class="fas fa-th-large"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_user_index' %}active{% endif %}"
+                    href="{{ path('app_admin_user_index') }}" title="Utilisateurs">
+                    <i class="fas fa-users"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_machine_index' %}active{% endif %}"
+                    href="{{ path('app_admin_machine_index') }}" title="Machines">
+                    <i class="fas fa-chart-bar"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_machine_index' %}active{% endif %}"
+                    href="{{ path('app_admin_machine_index') }}" title="Chantier">
+                    <i class="fas fa-chart-bar"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_troubleshooting_index' %}active{% endif %}"
+                    href="{{ path('app_admin_troubleshooting_index') }}" title="Arbre de dépannage">
+                    <i class="fas fa-comments"></i>
+                </a>
+            </li>
+            <li class="nav-item logout-item">
+                <a class="nav-link" href="{{ path('app_logout') }}" title="Déconnexion">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>

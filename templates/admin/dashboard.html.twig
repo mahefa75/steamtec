@@ -1,26 +1,235 @@
-{% extends 'admin/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Tableau de bord{% endblock %}
 
 {% block header_title %}Tableau de bord{% endblock %}
 
 {% block admin_content %}
-    <div class="dashboard">
-        {# Stats Cards #}
-        
+<div class="dashboard">
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    +2.5%
+                </div>
+            </div>
+            <div class="stat-value">€1,234.56</div>
+            <div class="stat-label">Revenus du mois</div>
+        </div>
 
-        {# Charts Section #}
-        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    +12.3%
+                </div>
+            </div>
+            <div class="stat-value">156</div>
+            <div class="stat-label">Transactions</div>
+        </div>
 
-        {# Products and Expenses Section #}
-        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-trend negative">
+                    <i class="fas fa-arrow-down"></i>
+                    -0.8%
+                </div>
+            </div>
+            <div class="stat-value">1,893</div>
+            <div class="stat-label">Utilisateurs actifs</div>
+        </div>
 
-        {# Customers Table #}
-        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    +5.2%
+                </div>
+            </div>
+            <div class="stat-value">89.3%</div>
+            <div class="stat-label">Taux de conversion</div>
+        </div>
     </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">Revenus mensuels</div>
+                <div class="chart-actions">
+                    <button class="active">Jour</button>
+                    <button>Semaine</button>
+                    <button>Mois</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">Transactions par type</div>
+                <div class="chart-actions">
+                    <button class="active">Tous</button>
+                    <button>Crédit</button>
+                    <button>Débit</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="transactionsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="side-panels">
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title">Dernières transactions</div>
+            </div>
+            <div class="expense-list">
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #123</div>
+                            <div class="expense-date">Il y a 2 heures</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount positive">+€25.00</div>
+                </div>
+
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #456</div>
+                            <div class="expense-date">Il y a 5 heures</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount positive">+€18.50</div>
+                </div>
+
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #789</div>
+                            <div class="expense-date">Il y a 8 heures</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount positive">+€4.50</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title">Machines populaires</div>
+            </div>
+            <div class="expense-list">
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #123</div>
+                            <div class="expense-date">156 transactions</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount">€1,245.00</div>
+                </div>
+
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #456</div>
+                            <div class="expense-date">132 transactions</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount">€986.50</div>
+                </div>
+
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="expense-details">
+                            <div class="expense-name">Machine #789</div>
+                            <div class="expense-date">98 transactions</div>
+                        </div>
+                    </div>
+                    <div class="expense-amount">€754.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration du graphique des revenus
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                    datasets: [{
+                        label: 'Revenus',
+                        data: [1200, 1900, 1500, 2100, 1800, 2300],
+                        borderColor: '#4361ee',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Configuration du graphique des transactions
+            const transactionsCtx = document.getElementById('transactionsChart').getContext('2d');
+            new Chart(transactionsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Crédit', 'Débit', 'En attente'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: ['#72b01d', '#f72585', '#f7b801']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+    </script>
 {% endblock %} 

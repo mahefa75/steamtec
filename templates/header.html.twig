@@ -1,0 +1,22 @@
+<header class="admin-header">
+    <div class="header-info">
+        <h1 class="header-title">{% block header_title %}Transactions{% endblock %}</h1>
+        <div class="header-meta">{{ "now"|date("d/m/Y H:i") }}</div>
+    </div>
+    <div class="user-menu">
+        <div class="menu-icons">
+            <button class="icon-button" title="Notifications">
+                <i class="far fa-bell"></i>
+            </button>
+        </div>
+        <div class="user-info">
+            <div class="user-details">
+                <div class="user-name">{{ app.user.email }}</div>
+            </div>
+            <div class="user-avatar">
+                <img src="https://ui-avatars.com/api/?name={{ app.user.email }}&background=random" 
+                        alt="Avatar" class="rounded-circle" title="{{ app.user.email }}">
+            </div>
+        </div>
+    </div>
+</header>

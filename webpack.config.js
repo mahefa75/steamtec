@@ -7,6 +7,7 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 Encore
     .setOutputPath('public/build/')
     .setPublicPath('/build')
+    .setManifestKeyPrefix('build/')
     .addEntry('admin', './assets/admin.js')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
