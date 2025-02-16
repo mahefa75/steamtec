@@ -1,360 +1,101 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('admin') }}
+    {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        :root {
-            --primary-bg: #1a1d21;
-            --secondary-bg: #22262a;
-            --card-bg: #2a2e32;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a4a8;
-            --border-color: #363a3e;
-            --sidebar-width: 240px;
-            --header-height: 70px;
-            --primary-color: #3b82f6;
-            --success-color: #22c55e;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .admin-sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--secondary-bg);
-            position: fixed;
-            height: 100vh;
-            border-right: 1px solid var(--border-color);
-            padding: 1.5rem;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .admin-sidebar .brand {
-            padding: 0.5rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .admin-sidebar .nav-link {
-            color: var(--text-secondary);
-            padding: 0.875rem 1rem;
-            margin: 0.25rem 0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .admin-sidebar .nav-link i {
-            width: 24px;
-            font-size: 1.25rem;
-            margin-right: 0.75rem;
-        }
-
-        .admin-sidebar .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        .admin-sidebar .nav-link.active {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .admin-main {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .admin-header h1 {
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .admin-header .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .admin-header .btn-link {
-            color: var(--text-secondary);
-            transition: color 0.2s ease;
-        }
-
-        .admin-header .btn-link:hover {
-            color: var(--text-primary);
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .card-stat {
-            padding: 1.5rem;
-        }
-
-        .stat-title {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            color: var(--text-primary);
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-
-        .stat-icon {
-            color: var(--primary-color);
-            opacity: 0.8;
-        }
-
-        .btn {
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #2563eb;
-            transform: translateY(-1px);
-        }
-
-        .btn-light {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--text-primary);
-        }
-
-        .btn-light:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: var(--text-primary);
-        }
-
-        .table {
-            color: var(--text-primary);
-            margin-bottom: 0;
-        }
-
-        .table th {
-            color: var(--text-secondary);
-            font-weight: 500;
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem;
-        }
-
-        .table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        .table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge {
-            padding: 0.5em 0.75em;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.75rem;
-        }
-
-        .form-control, .form-select {
-            background-color: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 8px;
-            padding: 0.625rem 1rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background-color: var(--secondary-bg);
-            border-color: var(--primary-color);
-            color: var(--text-primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-        }
-
-        .form-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .alert {
-            border: none;
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-success {
-            background-color: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-        }
-
-        .alert-danger {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-box .input-group {
-            background-color: var(--secondary-bg);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .search-box .input-group-text {
-            background-color: transparent;
-            border: none;
-            color: var(--text-secondary);
-        }
-
-        .search-box .form-control {
-            border: none;
-            padding-left: 0;
-        }
-
-        .search-box .form-control:focus {
-            box-shadow: none;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--secondary-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4a4d51;
-        }
-    </style>
-{% endblock %}
-
-{% block body %}
-    <div class="admin-layout">
+    {% block javascripts %}
+        {{ encore_entry_script_tags('admin') }}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% endblock %}
+</head>
+<body>
+    <div class="admin-wrapper">
         <aside class="admin-sidebar">
-            <div class="brand">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" height="40">
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_dashboard' %}active{% endif %}" 
-                       href="{{ path('app_admin_dashboard') }}">
-                        <i class="fas fa-home"></i>
-                        <span>Tableau de bord</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_user' %}active{% endif %}"
-                       href="{{ path('app_admin_user_index') }}">
-                        <i class="fas fa-users"></i>
-                        <span>Utilisateurs</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_machine' %}active{% endif %}"
-                       href="{{ path('app_admin_machine_index') }}">
-                        <i class="fas fa-cogs"></i>
-                        <span>Machines</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_troubleshooting' %}active{% endif %}"
-                       href="{{ path('app_admin_troubleshooting_index') }}">
-                        <i class="fas fa-sitemap"></i>
-                        <span>Dépannage</span>
-                    </a>
-                </li>
-            </ul>
+            <div class="logo">SteamTec</div>
+            <nav>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_dashboard' %}active{% endif %}" 
+                           href="{{ path('app_admin_dashboard') }}" title="Tableau de bord">
+                            <i class="fas fa-th-large"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_transactions' %}active{% endif %}"
+                           href="{{ path('app_admin_user_index') }}" title="Transactions">
+                            <i class="fas fa-exchange-alt"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_stats' %}active{% endif %}"
+                           href="{{ path('app_admin_machine_index') }}" title="Statistiques">
+                            <i class="fas fa-chart-bar"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_admin_messages' %}active{% endif %}"
+                           href="{{ path('app_admin_troubleshooting_index') }}" title="Messages">
+                            <i class="fas fa-comments"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_logout') }}" title="Déconnexion">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </aside>
 
         <main class="admin-main">
             <header class="admin-header">
-                <h1>{% block header_title %}Administration{% endblock %}</h1>
+                <div class="header-info">
+                    <h1 class="header-title">{% block header_title %}Transactions{% endblock %}</h1>
+                    <div class="header-meta">4:45 pm 21 Jul 2023</div>
+                </div>
                 <div class="user-menu">
-                    <a href="{{ path('app_home') }}" class="btn btn-link" title="Retour au site">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                    <a href="{{ path('app_logout') }}" class="btn btn-link" title="Déconnexion">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
-                    <div class="user-avatar">
-                        <img src="https://ui-avatars.com/api/?name={{ app.user.email }}&background=random" 
-                             alt="Avatar" class="rounded-circle" width="40" height="40">
+                    <div class="menu-icons">
+                        <button class="icon-button" title="Notifications">
+                            <i class="far fa-bell"></i>
+                        </button>
+                        <button class="icon-button" title="Messages">
+                            <i class="far fa-comment-dots"></i>
+                        </button>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-details">
+                            <div class="user-name">{{ app.user.email }}</div>
+                            <div class="user-role">Project Manager</div>
+                        </div>
+                        <div class="user-avatar">
+                            <img src="https://ui-avatars.com/api/?name={{ app.user.email }}&background=random" 
+                                 alt="Avatar">
+                        </div>
                     </div>
                 </div>
             </header>
 
-            {% for label, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ label }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+            <div class="admin-content">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
 
-            {% block admin_content %}{% endblock %}
+                {% block admin_content %}{% endblock %}
+            </div>
         </main>
     </div>
-{% endblock %} 
+</body>
+</html> 
