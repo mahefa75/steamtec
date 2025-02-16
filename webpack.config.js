@@ -9,6 +9,8 @@ Encore
     .setPublicPath('/build')
     .setManifestKeyPrefix('build/')
     .addEntry('admin', './assets/admin.js')
+    .addEntry('app', './assets/app.js')
+    .addStyleEntry('admin_styles', './assets/styles/admin.scss')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()

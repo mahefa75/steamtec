@@ -2,26 +2,257 @@
 
 {% block title %}Gestion des utilisateurs{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
 {% block header_title %}
-    <div class="d-flex align-items-center">
-        <div class="me-3">
-            <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" 
-                 style="width: 48px; height: 48px;">
-                <i class="fas fa-users text-primary"></i>
+    Utilisateurs
+{% endblock %}
+
+{% block admin_content %}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Liste des utilisateurs</h5>
+            <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#userFormOffcanvas" data-action="{{ path('app_admin_user_new') }}">
+                <i class="fas fa-plus me-2"></i>Nouvel utilisateur
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                {# Version desktop #}
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Rôles</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://ui-avatars.com/api/?name={{ user.email|url_encode }}&size=40&background=random" 
+                                                 alt="">
+                                        </div>
+                                        <div class="user-details">
+                                            <div class="user-email">{{ user.email }}</div>
+                                            <div class="user-id">ID: {{ user.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% for role in user.roles %}
+                                        {% if role != 'ROLE_USER' %}
+                                            {% set roleClass = role == 'ROLE_ADMIN' ? 'badge-admin' : 'badge bg-primary bg-opacity-10 text-primary' %}
+                                            {% set roleIcon = role == 'ROLE_ADMIN' ? 'crown' : 'user' %}
+                                            <span class="{{ roleClass }}">
+                                                <i class="fas fa-{{ roleIcon }}"></i>
+                                                {{ role|replace({'ROLE_': ''}) }}
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="offcanvas" 
+                                                data-bs-target="#userFormOffcanvas"
+                                                data-action="{{ path('app_admin_user_edit', {'id': user.id}) }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        {% if app.user != user %}
+                                            <form method="post" action="{{ path('app_admin_user_delete', {'id': user.id}) }}" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');" 
+                                                  style="display: inline-block;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4">
+                                    <div class="text-secondary">
+                                        <i class="fas fa-users fa-2x mb-3"></i>
+                                        <p class="mb-0">Aucun utilisateur trouvé</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {# Version mobile #}
+                <table class="table table-mobile">
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="mobile-label">Utilisateur</div>
+                                    <div class="mobile-content">
+                                        <div class="user-info">
+                                            <div class="user-avatar">
+                                                <img src="https://ui-avatars.com/api/?name={{ user.email|url_encode }}&size=40&background=random" 
+                                                     alt="">
+                                            </div>
+                                            <div class="user-details">
+                                                <div class="user-email">{{ user.email }}</div>
+                                                <div class="user-id">ID: {{ user.id }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mobile-label">Rôles</div>
+                                    <div class="mobile-content">
+                                        {% for role in user.roles %}
+                                            {% if role != 'ROLE_USER' %}
+                                                {% set roleClass = role == 'ROLE_ADMIN' ? 'badge-admin' : 'badge bg-primary bg-opacity-10 text-primary' %}
+                                                {% set roleIcon = role == 'ROLE_ADMIN' ? 'crown' : 'user' %}
+                                                <span class="{{ roleClass }}">
+                                                    <i class="fas fa-{{ roleIcon }}"></i>
+                                                    {{ role|replace({'ROLE_': ''}) }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mobile-label">Actions</div>
+                                    <div class="mobile-content">
+                                        <div class="action-buttons">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="offcanvas" 
+                                                    data-bs-target="#userFormOffcanvas"
+                                                    data-action="{{ path('app_admin_user_edit', {'id': user.id}) }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% if app.user != user %}
+                                                <form method="post" action="{{ path('app_admin_user_delete', {'id': user.id}) }}" 
+                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');" 
+                                                      style="display: inline-block;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4">
+                                    <div class="text-secondary">
+                                        <i class="fas fa-users fa-2x mb-3"></i>
+                                        <p class="mb-0">Aucun utilisateur trouvé</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div>
-            <h1 class="mb-0">Utilisateurs</h1>
-            <p class="text-secondary mb-0">Gérez les utilisateurs de la plateforme</p>
+    </div>
+
+    {# Offcanvas pour le formulaire d'édition #}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="userFormOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="userFormOffcanvasLabel">Édition utilisateur</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
-{% block admin_content %}
-    
-{% endblock %}
-
 {% block javascripts %}
     {{ parent() }}
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userFormOffcanvas = document.getElementById('userFormOffcanvas');
+            const offcanvasBody = userFormOffcanvas.querySelector('.offcanvas-body');
+            const offcanvasTitle = userFormOffcanvas.querySelector('.offcanvas-title');
+
+            // Gestionnaire pour le chargement du formulaire
+            userFormOffcanvas.addEventListener('show.bs.offcanvas', function(event) {
+                const button = event.relatedTarget;
+                const action = button.dataset.action;
+                const isNew = action.includes('new');
+
+                // Mise à jour du titre
+                offcanvasTitle.textContent = isNew ? 'Nouvel utilisateur' : 'Édition utilisateur';
+
+                // Chargement du formulaire
+                fetch(action)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const form = doc.querySelector('form');
+                        
+                        if (form) {
+                            // Ajout de la classe pour le style du formulaire
+                            form.classList.add('user-form');
+                            
+                            // Mise à jour du contenu
+                            offcanvasBody.innerHTML = '';
+                            offcanvasBody.appendChild(form);
+
+                            // Gestion de la soumission du formulaire
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                
+                                fetch(this.action, {
+                                    method: 'POST',
+                                    body: new FormData(this)
+                                })
+                                .then(response => response.text())
+                                .then(html => {
+                                    const newDoc = parser.parseFromString(html, 'text/html');
+                                    const newForm = newDoc.querySelector('form');
+                                    
+                                    if (newForm) {
+                                        // S'il y a des erreurs, on met à jour le formulaire
+                                        offcanvasBody.innerHTML = '';
+                                        offcanvasBody.appendChild(newForm);
+                                    } else {
+                                        // Si pas d'erreur, on recharge la page
+                                        window.location.reload();
+                                    }
+                                });
+                            });
+                        }
+                    });
+            });
+
+            // Nettoyage lors de la fermeture
+            userFormOffcanvas.addEventListener('hidden.bs.offcanvas', function() {
+                offcanvasBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
 {% endblock %} 

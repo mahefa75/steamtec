@@ -1,0 +1,249 @@
+// Styles pour le tableau des utilisateurs
+.table-responsive {
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+
+    > :not(caption) > * > * {
+        padding: 1rem;
+    }
+
+    thead th {
+        background: transparent;
+        font-weight: 600;
+        border-bottom: 2px solid var(--border-color);
+        white-space: nowrap;
+    }
+
+    tbody {
+        tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+
+            &:hover {
+                background-color: var(--secondary-bg);
+            }
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+}
+
+// Table mobile cachée par défaut
+.table-mobile {
+    display: none !important;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--secondary-bg);
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.user-details {
+    min-width: 0;
+
+    .user-email {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-id {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+}
+
+.badge-admin {
+    background-color: rgba(var(--danger-rgb), 0.1);
+    color: var(--danger-color);
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+// Styles responsifs
+@media (max-width: 768px) {
+    .table-responsive {
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    // Cache la table desktop
+    .table:not(.table-mobile) {
+        display: none !important;
+    }
+    
+    // Affiche la table mobile
+    .table-mobile {
+        display: table !important;
+        width: 100%;
+
+        tbody tr {
+            display: block;
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+        }
+
+        tbody td {
+            display: flex;
+            padding: 1rem;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+
+        .mobile-label {
+            font-weight: 600;
+            width: 120px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .mobile-content {
+            flex: 1;
+            min-width: 0;
+
+            .user-info {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        .action-buttons {
+            justify-content: flex-start;
+        }
+    }
+}
+
+// Styles pour l'offcanvas
+.offcanvas {
+    --bs-offcanvas-width: 400px;
+
+    .offcanvas-header {
+        padding: 1.5rem;
+        background-color: var(--bs-white);
+        border-bottom: 1px solid var(--border-color);
+
+        .offcanvas-title {
+            font-weight: 600;
+            color: var(--bs-dark);
+        }
+    }
+
+    .offcanvas-body {
+        padding: 1.5rem;
+    }
+}
+
+// Styles pour le formulaire utilisateur
+.user-form {
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--bs-gray-700);
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--bs-white);
+        transition: all 0.2s ease;
+
+        &:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+    }
+
+    .form-select {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--bs-white);
+        transition: all 0.2s ease;
+
+        &:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+    }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+
+        .form-check-input {
+            &:checked {
+                background-color: var(--bs-primary);
+                border-color: var(--bs-primary);
+            }
+        }
+
+        .form-check-label {
+            font-weight: normal;
+        }
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        margin-top: 1rem;
+    }
+
+    .alert {
+        margin-bottom: 1.5rem;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+} 
