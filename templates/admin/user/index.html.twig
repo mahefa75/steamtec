@@ -1,0 +1,182 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block header_title %}
+    <div class="d-flex align-items-center">
+        <div class="me-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" 
+                 style="width: 48px; height: 48px;">
+                <i class="fas fa-users text-primary"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="mb-0">Utilisateurs</h1>
+            <p class="text-secondary mb-0">Gérez les utilisateurs de la plateforme</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2">
+                        <i class="fas fa-users me-2"></i>
+                        {{ users|length }} utilisateurs
+                    </div>
+                    <div class="search-box">
+                        <div class="input-group">
+                            <span class="input-group-text border-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control ps-0" id="searchUsers" 
+                                   placeholder="Rechercher un utilisateur...">
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ path('app_admin_user_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nouvel utilisateur
+                </a>
+            </div>
+
+            {% if users is empty %}
+                <div class="text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 mb-3"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="mb-2">Aucun utilisateur</h5>
+                    <p class="text-secondary mb-4">Commencez par ajouter un nouvel utilisateur à la plateforme</p>
+                    <a href="{{ path('app_admin_user_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Ajouter un utilisateur
+                    </a>
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%">Utilisateur</th>
+                                <th style="width: 30%">Rôles</th>
+                                <th style="width: 15%">Statut</th>
+                                <th style="width: 15%" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3 rounded bg-secondary bg-opacity-10" 
+                                                 style="width: 48px; height: 48px; overflow: hidden;">
+                                                <img src="https://ui-avatars.com/api/?name={{ user.email }}&background=random" 
+                                                     alt="" class="w-100 h-100 object-fit-cover">
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">{{ user.email }}</h6>
+                                                <div class="d-flex align-items-center gap-3 text-secondary small">
+                                                    <span>
+                                                        <i class="fas fa-fingerprint me-1"></i>
+                                                        ID: {{ user.id }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% for role in user.roles %}
+                                            {% set roleClass = role == 'ROLE_ADMIN' ? 'bg-danger' : 'bg-primary' %}
+                                            {% set roleIcon = role == 'ROLE_ADMIN' ? 'fas fa-crown' : 'fas fa-user' %}
+                                            <span class="badge {{ roleClass }} bg-opacity-10 text-{{ role == 'ROLE_ADMIN' ? 'danger' : 'primary' }} px-3 py-2 me-2">
+                                                <i class="{{ roleIcon }} me-1"></i>
+                                                {{ role|replace({'ROLE_': ''}) }}
+                                            </span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if app.user == user %}
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                                                <i class="fas fa-circle me-1"></i>
+                                                Connecté
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                                <i class="fas fa-circle me-1"></i>
+                                                Actif
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if app.user != user %}
+                                            <div class="btn-group">
+                                                <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" 
+                                                   class="btn btn-light" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('app_admin_user_delete', {'id': user.id}) }}" 
+                                                      class="d-inline" 
+                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                    <button type="submit" class="btn btn-light text-danger" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-secondary" title="Compte actuel">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        .table th {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 1rem;
+        }
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .table tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        .badge {
+            font-weight: 500;
+        }
+        .object-fit-cover {
+            object-fit: cover;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.getElementById('searchUsers').addEventListener('keyup', function() {
+            let searchText = this.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                let email = row.querySelector('h6')?.textContent.toLowerCase() || '';
+                let id = row.querySelector('.fas.fa-fingerprint')?.parentElement?.textContent.toLowerCase() || '';
+                let roles = Array.from(row.querySelectorAll('.badge')).map(b => b.textContent.toLowerCase()).join(' ');
+                
+                row.style.display = (email.includes(searchText) || 
+                                   id.includes(searchText) || 
+                                   roles.includes(searchText)) ? '' : 'none';
+            });
+        });
+    </script>
+{% endblock %} 

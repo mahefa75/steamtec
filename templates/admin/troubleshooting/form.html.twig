@@ -1,0 +1,214 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ node.id ? 'Modifier' : 'Nouveau' }} nœud de dépannage{% endblock %}
+
+{% block header_title %}
+    <div class="d-flex align-items-center">
+        <div class="me-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" 
+                 style="width: 48px; height: 48px;">
+                <i class="fas fa-{{ node.id ? 'edit' : 'plus' }} text-warning"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="mb-0">
+                {% if parent_node is defined and parent_node %}
+                    Ajouter un nœud enfant
+                {% else %}
+                    {{ node.id ? 'Modifier' : 'Nouveau' }} nœud
+                {% endif %}
+            </h1>
+            <p class="text-secondary mb-0">
+                {% if parent_node is defined and parent_node %}
+                    Ajouter un nœud enfant à "{{ parent_node.title }}"
+                {% else %}
+                    {{ node.id ? 'Modifier les informations du nœud' : 'Créer un nouveau nœud dans l\'arbre de dépannage' }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if parent_node is defined and parent_node %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" 
+                                     style="width: 48px; height: 48px;">
+                                    <i class="fas fa-sitemap text-warning"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="mb-2">Nœud parent</h6>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="fw-medium">{{ parent_node.title }}</span>
+                                    {% if parent_node.machine %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                            <i class="fas fa-cog me-1"></i>
+                                            {{ parent_node.machine.name }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-secondary small mb-0">{{ parent_node.description|u.truncate(100, '...') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-body">
+                    {% if node.id %}
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="me-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" 
+                                     style="width: 48px; height: 48px;">
+                                    <i class="fas fa-sitemap text-warning"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ node.title }}</h5>
+                                <div class="d-flex align-items-center gap-3 text-secondary small">
+                                    <span>
+                                        <i class="fas fa-fingerprint me-1"></i>
+                                        ID: {{ node.id }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ node.updatedAt ? 'Modifié le ' ~ node.updatedAt|date('d/m/Y H:i') : 'Créé le ' ~ node.createdAt|date('d/m/Y H:i') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.title, {
+                                        'attr': {
+                                            'class': 'form-control form-control-lg',
+                                            'placeholder': 'Titre du nœud'
+                                        }
+                                    }) }}
+                                    {% if form_errors(form.title) %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(form.title) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.description, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'rows': 5,
+                                            'placeholder': 'Description détaillée du problème ou de la solution'
+                                        }
+                                    }) }}
+                                    {% if form_errors(form.description) %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(form.description) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(form.machine, null, {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.machine, {
+                                        'attr': {
+                                            'class': 'form-select form-select-lg'
+                                        }
+                                    }) }}
+                                    {% if form_errors(form.machine) %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(form.machine) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="solution-switch p-4 rounded" style="background-color: var(--secondary-bg);">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <label class="form-check-label h6 mb-1" for="{{ form.isSolution.vars.id }}">
+                                                    Ce nœud est une solution
+                                                </label>
+                                                <p class="text-secondary small mb-0">
+                                                    Activez cette option si ce nœud représente une solution finale
+                                                </p>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                {{ form_widget(form.isSolution, {
+                                                    'attr': {
+                                                        'class': 'form-check-input',
+                                                        'style': 'width: 3rem; height: 1.5rem;'
+                                                    }
+                                                }) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if form_errors(form.isSolution) %}
+                                        <div class="invalid-feedback d-block mt-2">
+                                            {{ form_errors(form.isSolution) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ path('app_admin_troubleshooting_index') }}" class="btn btn-light">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-{{ node.id ? 'save' : 'plus' }} me-2"></i>
+                                {{ node.id ? 'Enregistrer les modifications' : 'Créer le nœud' }}
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-check.form-switch {
+            padding-left: 0;
+        }
+        .form-switch .form-check-input {
+            margin-left: 0;
+            cursor: pointer;
+        }
+        .form-switch .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        .solution-switch {
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .solution-switch:hover {
+            border-color: var(--success-color);
+            background-color: rgba(34, 197, 94, 0.1) !important;
+        }
+        .invalid-feedback {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            color: var(--danger-color);
+        }
+    </style>
+{% endblock %} 

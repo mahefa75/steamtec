@@ -1,0 +1,241 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+{% block header_title %}
+    <div class="d-flex align-items-center">
+        <div class="me-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" 
+                 style="width: 48px; height: 48px;">
+                <i class="fas fa-chart-line text-primary"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="mb-0">Tableau de bord</h1>
+            <p class="text-secondary mb-0">Bonjour, {{ app.user.email }}</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="row g-4 mb-4">
+        {# Users Stats Card #}
+        <div class="col-xl-4 col-md-6">
+            <div class="card card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="stat-title">Utilisateurs</p>
+                        <h2 class="stat-value">{{ users_count }}</h2>
+                        <p class="text-secondary mb-0 mt-2">
+                            <i class="fas fa-user-plus me-1"></i>
+                            {{ latest_users|length }} nouveaux
+                        </p>
+                    </div>
+                    <div class="stat-icon">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" 
+                             style="width: 56px; height: 56px;">
+                            <i class="fas fa-users fa-lg text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Machines Stats Card #}
+        <div class="col-xl-4 col-md-6">
+            <div class="card card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="stat-title">Machines</p>
+                        <h2 class="stat-value">{{ machines_count }}</h2>
+                        <p class="text-secondary mb-0 mt-2">
+                            <i class="fas fa-plus-circle me-1"></i>
+                            {{ latest_machines|length }} nouvelles
+                        </p>
+                    </div>
+                    <div class="stat-icon">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" 
+                             style="width: 56px; height: 56px;">
+                            <i class="fas fa-cogs fa-lg text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Troubleshooting Stats Card #}
+        <div class="col-xl-4 col-md-6">
+            <div class="card card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="stat-title">Arbres de dépannage</p>
+                        <h2 class="stat-value">{{ troubleshooting_count }}</h2>
+                        <p class="text-secondary mb-0 mt-2">
+                            <i class="fas fa-sitemap me-1"></i>
+                            Solutions actives
+                        </p>
+                    </div>
+                    <div class="stat-icon">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" 
+                             style="width: 56px; height: 56px;">
+                            <i class="fas fa-sitemap fa-lg text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# Recent Users Table #}
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-users text-primary"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-0">Derniers utilisateurs</h5>
+                                <p class="text-secondary mb-0 small">Liste des derniers utilisateurs inscrits</p>
+                            </div>
+                        </div>
+                        <a href="{{ path('app_admin_user_index') }}" class="btn btn-primary btn-sm">
+                            Voir tous
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Rôles</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in latest_users %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://ui-avatars.com/api/?name={{ user.email }}&size=32&background=random" 
+                                                     class="rounded-circle me-2" alt="">
+                                                <div>
+                                                    <div class="fw-medium">{{ user.email }}</div>
+                                                    <div class="text-secondary small">ID: {{ user.id }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% for role in user.roles %}
+                                                {% set roleClass = role == 'ROLE_ADMIN' ? 'bg-danger' : 'bg-primary' %}
+                                                <span class="badge {{ roleClass }}">{{ role }}</span>
+                                            {% endfor %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" 
+                                               class="btn btn-sm btn-light">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Recent Machines Table #}
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-cogs text-success"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-0">Dernières machines</h5>
+                                <p class="text-secondary mb-0 small">Liste des dernières machines ajoutées</p>
+                            </div>
+                        </div>
+                        <a href="{{ path('app_admin_machine_index') }}" class="btn btn-primary btn-sm">
+                            Voir toutes
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Machine</th>
+                                    <th>Modèle</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for machine in latest_machines %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if machine.imageUrl %}
+                                                    <div class="me-2" style="width: 32px; height: 32px;">
+                                                        <img src="{{ machine.imageUrl }}" 
+                                                             class="rounded" alt=""
+                                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                                    </div>
+                                                {% else %}
+                                                    <div class="me-2 d-flex align-items-center justify-content-center rounded bg-secondary bg-opacity-10" 
+                                                         style="width: 32px; height: 32px;">
+                                                        <i class="fas fa-cog text-secondary"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-medium">{{ machine.name }}</div>
+                                                    <div class="text-secondary small">ID: {{ machine.id }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                                {{ machine.model }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ path('app_admin_machine_edit', {'id': machine.id}) }}" 
+                                               class="btn btn-sm btn-light">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card-stat:hover .stat-icon {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+        .badge {
+            font-weight: 500;
+        }
+        .table th {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+    </style>
+{% endblock %} 

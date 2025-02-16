@@ -1,0 +1,177 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des machines{% endblock %}
+
+{% block header_title %}
+    <div class="d-flex align-items-center">
+        <div class="me-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10" 
+                 style="width: 48px; height: 48px;">
+                <i class="fas fa-cogs text-success"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="mb-0">Machines</h1>
+            <p class="text-secondary mb-0">Gérez les machines de la plateforme</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">
+                        <i class="fas fa-cogs me-2"></i>
+                        {{ machines|length }} machines
+                    </div>
+                    <div class="search-box">
+                        <div class="input-group">
+                            <span class="input-group-text border-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control ps-0" id="searchMachines" 
+                                   placeholder="Rechercher une machine...">
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ path('app_admin_machine_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nouvelle machine
+                </a>
+            </div>
+
+            {% if machines is empty %}
+                <div class="text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 mb-3"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-cogs fa-2x text-success"></i>
+                    </div>
+                    <h5 class="mb-2">Aucune machine</h5>
+                    <p class="text-secondary mb-4">Commencez par ajouter une nouvelle machine à la plateforme</p>
+                    <a href="{{ path('app_admin_machine_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Ajouter une machine
+                    </a>
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%">Machine</th>
+                                <th style="width: 20%">Modèle</th>
+                                <th style="width: 30%">Description</th>
+                                <th style="width: 15%" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for machine in machines %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if machine.imageUrl %}
+                                                <div class="me-3 rounded bg-secondary bg-opacity-10" 
+                                                     style="width: 48px; height: 48px; overflow: hidden;">
+                                                    <img src="{{ machine.imageUrl }}" 
+                                                         alt="" class="w-100 h-100 object-fit-cover">
+                                                </div>
+                                            {% else %}
+                                                <div class="me-3 d-flex align-items-center justify-content-center rounded bg-secondary bg-opacity-10" 
+                                                     style="width: 48px; height: 48px;">
+                                                    <i class="fas fa-cog fa-lg text-secondary"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-1">{{ machine.name }}</h6>
+                                                <div class="d-flex align-items-center gap-3 text-secondary small">
+                                                    <span>
+                                                        <i class="fas fa-fingerprint me-1"></i>
+                                                        ID: {{ machine.id }}
+                                                    </span>
+                                                    <span>
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        {{ machine.updatedAt ? machine.updatedAt|date('d/m/Y H:i') : machine.createdAt|date('d/m/Y H:i') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                                            <i class="fas fa-tag me-1"></i>
+                                            {{ machine.model }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="text-secondary small" style="max-width: 300px;">
+                                            {{ machine.description|u.truncate(100, '...') }}
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_admin_machine_edit', {'id': machine.id}) }}" 
+                                               class="btn btn-light" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_admin_machine_delete', {'id': machine.id}) }}" 
+                                                  class="d-inline" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette machine ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
+                                                <button type="submit" class="btn btn-light text-danger" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        .table th {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 1rem;
+        }
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .table tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        .badge {
+            font-weight: 500;
+        }
+        .object-fit-cover {
+            object-fit: cover;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.getElementById('searchMachines').addEventListener('keyup', function() {
+            let searchText = this.value.toLowerCase();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                let name = row.querySelector('h6')?.textContent.toLowerCase() || '';
+                let model = row.querySelector('.badge')?.textContent.toLowerCase() || '';
+                let description = row.querySelector('.text-secondary')?.textContent.toLowerCase() || '';
+                let id = row.querySelector('.fas.fa-fingerprint')?.parentElement?.textContent.toLowerCase() || '';
+                
+                row.style.display = (name.includes(searchText) || 
+                                   model.includes(searchText) || 
+                                   description.includes(searchText) ||
+                                   id.includes(searchText)) ? '' : 'none';
+            });
+        });
+    </script>
+{% endblock %} 

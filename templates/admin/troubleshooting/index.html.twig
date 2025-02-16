@@ -1,0 +1,254 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion de l'arbre de dépannage{% endblock %}
+
+{% block header_title %}
+    <div class="d-flex align-items-center">
+        <div class="me-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10" 
+                 style="width: 48px; height: 48px;">
+                <i class="fas fa-sitemap text-warning"></i>
+            </div>
+        </div>
+        <div>
+            <h1 class="mb-0">Arbre de dépannage</h1>
+            <p class="text-secondary mb-0">Gérez la structure de l'arbre de dépannage</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .node-tree {
+            list-style: none;
+            padding-left: 0;
+        }
+        .node-tree ul {
+            list-style: none;
+            padding-left: 2.5rem;
+            position: relative;
+        }
+        .node-tree ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 16px;
+            border-left: 2px solid var(--border-color);
+            height: 100%;
+        }
+        .node-item {
+            position: relative;
+            margin: 0.75rem 0;
+            padding: 1.25rem;
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .node-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+        .node-solution {
+            border-left: 4px solid var(--success-color);
+        }
+        .node-actions {
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+        .node-item:hover .node-actions {
+            opacity: 1;
+        }
+        .node-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        .node-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.925rem;
+            line-height: 1.5;
+        }
+        .node-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+        .node-machine {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            background-color: var(--secondary-bg);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .node-machine:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        .node-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .node-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .node-badge.solution {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+        .node-empty {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        .node-empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--secondary-bg);
+            color: var(--text-secondary);
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2">
+                        <i class="fas fa-sitemap me-2"></i>
+                        {{ root_nodes|length }} arbres
+                    </div>
+                    <div class="search-box">
+                        <div class="input-group">
+                            <span class="input-group-text border-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control ps-0" id="searchNodes" 
+                                   placeholder="Rechercher dans l'arbre...">
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ path('app_admin_troubleshooting_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nouveau nœud
+                </a>
+            </div>
+
+            {% if root_nodes is empty %}
+                <div class="node-empty">
+                    <div class="node-empty-icon">
+                        <i class="fas fa-sitemap fa-2x"></i>
+                    </div>
+                    <h5 class="mb-2">Aucun arbre de dépannage</h5>
+                    <p class="text-secondary mb-4">Commencez par créer le premier nœud de votre arbre de dépannage</p>
+                    <a href="{{ path('app_admin_troubleshooting_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Créer le premier nœud
+                    </a>
+                </div>
+            {% else %}
+                <ul class="node-tree">
+                    {% for node in root_nodes %}
+                        {{ _self.render_node(node) }}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% macro render_node(node) %}
+    <li class="node-item-wrapper">
+        <div class="node-item {% if node.isSolution %}node-solution{% endif %}">
+            <div class="d-flex justify-content-between">
+                <div class="flex-grow-1">
+                    <h5 class="node-title">{{ node.title }}</h5>
+                    <p class="node-description">{{ node.description|u.truncate(150, '...') }}</p>
+                    <div class="node-meta">
+                        {% if node.machine %}
+                            <div class="node-machine">
+                                <i class="fas fa-cog"></i>
+                                {{ node.machine.name }}
+                            </div>
+                        {% endif %}
+                        {% if node.isSolution %}
+                            <div class="node-badge solution">
+                                <i class="fas fa-check-circle"></i>
+                                Solution
+                            </div>
+                        {% endif %}
+                        <div class="node-date">
+                            <i class="fas fa-clock"></i>
+                            {{ node.updatedAt ? node.updatedAt|date('d/m/Y H:i') : node.createdAt|date('d/m/Y H:i') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="node-actions ms-4">
+                    <div class="btn-group">
+                        <a href="{{ path('app_admin_troubleshooting_add_child', {'id': node.id}) }}" 
+                           class="btn btn-light" title="Ajouter un enfant">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                        <a href="{{ path('app_admin_troubleshooting_edit', {'id': node.id}) }}" 
+                           class="btn btn-light" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form method="post" action="{{ path('app_admin_troubleshooting_delete', {'id': node.id}) }}" 
+                              class="d-inline" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce nœud et tous ses enfants ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ node.id) }}">
+                            <button type="submit" class="btn btn-light text-danger" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if node.children|length > 0 %}
+            <ul>
+                {% for child in node.children %}
+                    {{ _self.render_node(child) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.getElementById('searchNodes').addEventListener('keyup', function() {
+            let searchText = this.value.toLowerCase();
+            document.querySelectorAll('.node-item').forEach(node => {
+                let title = node.querySelector('.node-title')?.textContent.toLowerCase() || '';
+                let description = node.querySelector('.node-description')?.textContent.toLowerCase() || '';
+                let machine = node.querySelector('.node-machine')?.textContent.toLowerCase() || '';
+                let isVisible = title.includes(searchText) || 
+                              description.includes(searchText) || 
+                              machine.includes(searchText);
+                
+                node.closest('.node-item-wrapper').style.display = isVisible ? '' : 'none';
+            });
+        });
+    </script>
+{% endblock %} 
